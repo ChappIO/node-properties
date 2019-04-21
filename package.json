@@ -1,0 +1,34 @@
+{
+  "name": "node-properties",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChappIO/node-properties.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChappIO/node-properties/issues"
+  },
+  "homepage": "https://github.com/ChappIO/node-properties#readme",
+  "devDependencies": {
+    "@types/node": "^11.13.6",
+    "prettier": "^1.17.0",
+    "ts-node-dev": "^1.0.0-pre.32",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.4"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": true,
+    "trailingComma": "all",
+    "tabWidth": 2
+  }
+}

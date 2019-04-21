@@ -1,0 +1,6 @@
+### WEBSTORM ###
+.idea/
+
+### NODE ###
+node_modules/
+dist/
