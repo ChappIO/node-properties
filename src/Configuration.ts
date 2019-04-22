@@ -97,10 +97,10 @@ export class Configuration {
     let currentValue = this.properties;
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
-      if (!(part in currentValue)) {
-        return undefined;
-      } else {
+      if (currentValue instanceof Object && part in currentValue) {
         currentValue = currentValue[part];
+      } else {
+        return undefined;
       }
     }
     return currentValue;
@@ -111,7 +111,7 @@ export class Configuration {
 
     let currentValue = this.properties;
 
-    for (let i = 0; i < parts.length - 1; i++) {
+    for (let i = 0; i < parts.length - 1 && currentValue instanceof Object; i++) {
       const part = parts[i];
       if (!(part in currentValue)) {
         currentValue[part] = {};
