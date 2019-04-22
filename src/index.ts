@@ -8,14 +8,17 @@ import { CommandLineSource } from './CommandLineSource';
 import { YamlSource } from './YamlSource';
 import { JsonSource } from './JsonSource';
 
+const config = new Configuration();
+
 export {
+  CommandLineSource,
   Configuration,
-  Source,
-  Property,
+  EnvironmentSource,
   JsonSource,
   YamlSource,
-  CommandLineSource,
-  EnvironmentSource,
+  Source,
+  Property,
   Logger,
   Options,
+  config,
 };

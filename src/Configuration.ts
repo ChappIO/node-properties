@@ -12,7 +12,7 @@ export class Configuration {
   private readonly logger: Logger;
   private initLoader?: Promise<this>;
 
-  constructor(options: Options) {
+  constructor(options: Options = {}) {
     this.logger = options.logger || console;
     this.sources = options.sources || [
       new JsonSource('defaults.json', this.logger),
