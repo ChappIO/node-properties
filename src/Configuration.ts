@@ -14,6 +14,8 @@ export class Configuration {
 
   constructor(options: Options = {}) {
     this.logger = options.logger || console;
+    const env = process.env.NODE_ENV || 'development';
+
     this.sources = options.sources || [
       new JsonSource('defaults.json', this.logger),
       new YamlSource('defaults.yaml', this.logger),
@@ -21,6 +23,12 @@ export class Configuration {
       new JsonSource('config/defaults.json', this.logger),
       new YamlSource('config/defaults.yaml', this.logger),
       new PropertiesSource('config/defaults.env', this.logger),
+      new JsonSource(`${env}.json`, this.logger),
+      new YamlSource(`${env}.yaml`, this.logger),
+      new PropertiesSource(`${env}.env`, this.logger),
+      new JsonSource(`config/${env}.json`, this.logger),
+      new YamlSource(`config/${env}.yaml`, this.logger),
+      new PropertiesSource(`config/${env}.env`, this.logger),
       new EnvironmentSource(),
       new CommandLineSource(),
     ];
