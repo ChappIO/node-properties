@@ -5,7 +5,7 @@ export class EnvironmentSource implements Source {
   constructor(private readonly env: object = process.env) {
   }
 
-  async load(): Promise<Property[]> {
+  load(): Property[] {
     const result: Property[] = [];
 
     for (let key in process.env) {

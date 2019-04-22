@@ -5,7 +5,7 @@ export class CommandLineSource implements Source {
   constructor(private readonly args: string[] = process.argv) {
   }
 
-  async load(): Promise<Property[]> {
+  load(): Property[] {
     const result: Property[] = [];
 
     let dashProp = '';
@@ -25,7 +25,7 @@ export class CommandLineSource implements Source {
       }
     }
 
-    if(dashProp) {
+    if (dashProp) {
       result.push({ key: dashProp, value: true });
     }
 

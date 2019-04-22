@@ -5,20 +5,22 @@ import { EnvironmentSource } from './EnvironmentSource';
 import { YamlSource } from './YamlSource';
 import { Options } from './Options';
 import { Logger } from './Logger';
+import { PropertiesSource } from './PropertiesSource';
 
 export class Configuration {
   private readonly sources: Source[] = [];
   private readonly properties: any = {};
   private readonly logger: Logger;
-  private initLoader?: Promise<this>;
 
   constructor(options: Options = {}) {
     this.logger = options.logger || console;
     this.sources = options.sources || [
       new JsonSource('defaults.json', this.logger),
       new YamlSource('defaults.yaml', this.logger),
+      new PropertiesSource('defaults.env', this.logger),
       new JsonSource('config/defaults.json', this.logger),
       new YamlSource('config/defaults.yaml', this.logger),
+      new PropertiesSource('config/defaults.env', this.logger),
       new EnvironmentSource(),
       new CommandLineSource(),
     ];
@@ -28,25 +30,18 @@ export class Configuration {
     return key.toLowerCase().replace(/[^a-z0-9]/g, '.');
   }
 
-  init(): Promise<this> {
-    if (!this.initLoader) {
-      // Make sure we only load once
-      this.initLoader = this.load(...this.sources);
-    }
-    return this.initLoader;
+  init(): void {
+    this.load(...this.sources);
   }
 
-  async load(...sources: Source[]): Promise<this> {
-    const datas = await Promise.all(sources.map(s => s.load()));
-
-    for (let d = 0; d < datas.length; d++) {
-      const newProps = datas[d];
-      for (let i = 0; i < newProps.length; i++) {
-        const prop = newProps[i];
+  load(...sources: Source[]): void {
+    sources.forEach(s => {
+      const props = s.load();
+      for (let i = 0; i < props.length; i++) {
+        const prop = props[i];
         this.set(prop.key, prop.value);
       }
-    }
-    return this;
+    });
   }
 
   get(key?: string) {

@@ -1,8 +1,8 @@
 import { Source } from './Source';
 import { Property } from './Property';
-import { readFile } from 'fs';
+import { readFileSync } from 'fs';
 import { explode } from './explode';
-import yaml from 'js-yaml';
+import { safeLoad } from 'js-yaml';
 import { Logger } from './Logger';
 
 export class YamlSource implements Source {
@@ -10,24 +10,14 @@ export class YamlSource implements Source {
               private readonly logger: Logger) {
   }
 
-  load(): Promise<Property[]> {
-    return new Promise<string>((resolve) => {
-      readFile(this.path, (err, data) => {
-        if (err) {
-          this.logger.debug(`Failed to read yaml from ${this.path}: ${err}`);
-          resolve('');
-        } else {
-          resolve(data.toString('utf-8'));
-        }
-      });
-    })
-      .then(data => {
-        if (data) {
-          const values = yaml.safeLoad(data);
-          return explode(values);
-        } else {
-          return [];
-        }
-      });
+  load(): Property[] {
+    try {
+      const data = readFileSync(this.path, 'utf-8');
+      const values = safeLoad(data);
+      return explode(values);
+    } catch (e) {
+      this.logger.debug(`Failed to read json from ${this.path}: ${e}`);
+      return [];
+    }
   }
 }

@@ -7,8 +7,10 @@ import { EnvironmentSource } from './EnvironmentSource';
 import { CommandLineSource } from './CommandLineSource';
 import { YamlSource } from './YamlSource';
 import { JsonSource } from './JsonSource';
+import { PropertiesSource } from './PropertiesSource';
 
 const config = new Configuration();
+config.init();
 
 export {
   CommandLineSource,
@@ -18,6 +20,7 @@ export {
   YamlSource,
   Source,
   Property,
+  PropertiesSource,
   Logger,
   Options,
   config,

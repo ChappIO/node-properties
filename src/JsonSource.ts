@@ -1,6 +1,6 @@
 import { Source } from './Source';
 import { Property } from './Property';
-import { readFile } from 'fs';
+import { readFileSync } from 'fs';
 import { explode } from './explode';
 import { Logger } from './Logger';
 
@@ -9,24 +9,14 @@ export class JsonSource implements Source {
               private readonly logger: Logger) {
   }
 
-  load(): Promise<Property[]> {
-    return new Promise<string>((resolve, reject) => {
-      readFile(this.path, (err, data) => {
-        if (err) {
-          this.logger.debug(`Failed to read json from ${this.path}: ${err}`);
-          resolve('');
-        } else {
-          resolve(data.toString('utf-8'));
-        }
-      });
-    })
-      .then(data => {
-        if (data) {
-          const values = JSON.parse(data);
-          return explode(values);
-        } else {
-          return [];
-        }
-      });
+  load(): Property[] {
+    try {
+      const data = readFileSync(this.path, 'utf-8');
+      const values = JSON.parse(data);
+      return explode(values);
+    } catch (e) {
+      this.logger.debug(`Failed to read json from ${this.path}: ${e}`);
+      return [];
+    }
   }
 }
