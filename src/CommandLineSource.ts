@@ -25,6 +25,10 @@ export class CommandLineSource implements Source {
       }
     }
 
+    if(dashProp) {
+      result.push({ key: dashProp, value: true });
+    }
+
     return result;
   }
 

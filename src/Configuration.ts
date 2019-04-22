@@ -2,22 +2,38 @@ import { Source } from './Source';
 import { JsonSource } from './JsonSource';
 import { CommandLineSource } from './CommandLineSource';
 import { EnvironmentSource } from './EnvironmentSource';
+import { YamlSource } from './YamlSource';
+import { Options } from './Options';
+import { Logger } from './Logger';
 
 export class Configuration {
   private readonly sources: Source[] = [];
   private readonly properties: any = {};
+  private readonly logger: Logger;
+  private initLoader?: Promise<this>;
+
+  constructor(options: Options) {
+    this.logger = options.logger || console;
+    this.sources = options.sources || [
+      new JsonSource('defaults.json', this.logger),
+      new YamlSource('defaults.yaml', this.logger),
+      new JsonSource('config/defaults.json', this.logger),
+      new YamlSource('config/defaults.yaml', this.logger),
+      new EnvironmentSource(),
+      new CommandLineSource(),
+    ];
+  }
 
   private static normalizeKey(key: string): string {
     return key.toLowerCase().replace(/[^a-z0-9]/g, '.');
   }
 
   init(): Promise<this> {
-    return this.load(
-      new JsonSource('defaults.json'),
-      new JsonSource('config/defaults.json'),
-      new EnvironmentSource(),
-      new CommandLineSource(),
-    );
+    if (!this.initLoader) {
+      // Make sure we only load once
+      this.initLoader = this.load(...this.sources);
+    }
+    return this.initLoader;
   }
 
   async load(...sources: Source[]): Promise<this> {
