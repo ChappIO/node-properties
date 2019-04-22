@@ -1,7 +1,14 @@
 # node-properties
 
+[![NPM](https://nodei.co/npm/node-properties.svg?downloads=true&downloadRank=true)](https://www.npmjs.com/package/node-properties)
+
 Extremely flexible, no-hassle configuration for nodejs applications.
 
+## Install
+
+```bash
+npm i node-properties
+```
 
 ## Usage
 
