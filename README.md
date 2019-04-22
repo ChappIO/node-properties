@@ -35,6 +35,4 @@ By default, properties are retrieved in the following order:
 1. Command line parameters
 2. Environment variables
 3. `config/${NODE_ENV}` (.yaml, .json, or .env)
-5. `${NODE_ENV}` (.yaml, .json, or .env)
-7. `config/defaults` (.yaml, .json, or .env)
-9. `defaults` (.yaml, .json, or .env)
+4. `config/defaults` (.yaml, .json, or .env)

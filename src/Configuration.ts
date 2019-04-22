@@ -6,6 +6,19 @@ import { YamlSource } from './YamlSource';
 import { Options } from './Options';
 import { Logger } from './Logger';
 import { PropertiesSource } from './PropertiesSource';
+import { readdirSync } from 'fs';
+import { join } from 'path';
+import { NullSource } from './NullSource';
+
+const env = process.env.NODE_ENV || 'development';
+const configFileNames = [
+  'defaults.env',
+  'defaults.json',
+  'defaults.yaml',
+  `${env}.env`,
+  `${env}.json`,
+  `${env}.yaml`,
+];
 
 export class Configuration {
   private readonly sources: Source[] = [];
@@ -16,22 +29,44 @@ export class Configuration {
     this.logger = options.logger || console;
     const env = process.env.NODE_ENV || 'development';
 
-    this.sources = options.sources || [
-      new JsonSource('defaults.json', this.logger),
-      new YamlSource('defaults.yaml', this.logger),
-      new PropertiesSource('defaults.env', this.logger),
-      new JsonSource('config/defaults.json', this.logger),
-      new YamlSource('config/defaults.yaml', this.logger),
-      new PropertiesSource('config/defaults.env', this.logger),
-      new JsonSource(`${env}.json`, this.logger),
-      new YamlSource(`${env}.yaml`, this.logger),
-      new PropertiesSource(`${env}.env`, this.logger),
-      new JsonSource(`config/${env}.json`, this.logger),
-      new YamlSource(`config/${env}.yaml`, this.logger),
-      new PropertiesSource(`config/${env}.env`, this.logger),
-      new EnvironmentSource(),
-      new CommandLineSource(),
-    ];
+    if (options.sources) {
+      this.sources = options.sources;
+    } else {
+      try {
+        const files = readdirSync('config');
+        const configFiles = configFileNames
+          .filter(file => files.indexOf(file) >= 0);
+
+        const fileSources = configFiles.map<Source>((file: string): Source => {
+          const path = join(process.cwd(), 'config', file);
+          const extIndex = file.lastIndexOf('.');
+          if (extIndex === -1) {
+            return new NullSource();
+          }
+
+          switch (file.substr(extIndex).toLowerCase()) {
+            case '.env':
+              return new PropertiesSource(path, this.logger);
+            case '.json':
+              return new JsonSource(path, this.logger);
+            case '.yaml':
+            case '.yml':
+              return new YamlSource(path, this.logger);
+            default:
+              return new NullSource();
+          }
+        }).filter(s => !!s);
+
+        this.sources = [
+          ...fileSources,
+          new EnvironmentSource(),
+          new CommandLineSource(),
+        ];
+      } catch (e) {
+        this.logger.error(`Failed to load configuration: ${e}`);
+        this.sources = [];
+      }
+    }
   }
 
   private static normalizeKey(key: string): string {
