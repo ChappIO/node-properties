@@ -5,9 +5,7 @@ import { explode } from './explode';
 import { Logger } from './Logger';
 
 export class JsonSource implements Source {
-  constructor(private readonly path: string,
-              private readonly logger: Logger) {
-  }
+  constructor(private readonly path: string, private readonly logger: Logger) {}
 
   load(): Property[] {
     try {

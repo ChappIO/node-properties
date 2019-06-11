@@ -20,24 +20,16 @@ const configFileNames = [
   `${env}.yaml`,
 ];
 
-export class Configuration {
-  private readonly sources: Source[] = [];
-  private readonly properties: any = {};
-  private readonly logger: Logger;
+function loadFileSources(logger: Logger): Source[] {
+  try {
+    const files = readdirSync('config');
+    const configFiles = configFileNames.filter(
+      file => files.indexOf(file) >= 0,
+    );
 
-  constructor(options: Options = {}) {
-    this.logger = options.logger || console;
-    const env = process.env.NODE_ENV || 'development';
-
-    if (options.sources) {
-      this.sources = options.sources;
-    } else {
-      try {
-        const files = readdirSync('config');
-        const configFiles = configFileNames
-          .filter(file => files.indexOf(file) >= 0);
-
-        const fileSources = configFiles.map<Source>((file: string): Source => {
+    return configFiles
+      .map<Source>(
+        (file: string): Source => {
           const path = join(process.cwd(), 'config', file);
           const extIndex = file.lastIndexOf('.');
           if (extIndex === -1) {
@@ -46,26 +38,40 @@ export class Configuration {
 
           switch (file.substr(extIndex).toLowerCase()) {
             case '.env':
-              return new PropertiesSource(path, this.logger);
+              return new PropertiesSource(path, logger);
             case '.json':
-              return new JsonSource(path, this.logger);
+              return new JsonSource(path, logger);
             case '.yaml':
             case '.yml':
-              return new YamlSource(path, this.logger);
+              return new YamlSource(path, logger);
             default:
               return new NullSource();
           }
-        }).filter(s => !!s);
+        },
+      )
+      .filter(s => !(s instanceof NullSource));
+  } catch (e) {
+    logger.info(`Failed to load config files. Skipping... ${e}`);
+    return [];
+  }
+}
 
-        this.sources = [
-          ...fileSources,
-          new EnvironmentSource(),
-          new CommandLineSource(),
-        ];
-      } catch (e) {
-        this.logger.error(`Failed to load configuration: ${e}`);
-        this.sources = [];
-      }
+export class Configuration {
+  private readonly sources: Source[] = [];
+  private readonly properties: any = {};
+  private readonly logger: Logger;
+
+  constructor(options: Options = {}) {
+    this.logger = options.logger || console;
+
+    if (options.sources) {
+      this.sources = options.sources;
+    } else {
+      this.sources = [
+        ...loadFileSources(this.logger),
+        new EnvironmentSource(),
+        new CommandLineSource(),
+      ];
     }
   }
 
@@ -111,7 +117,11 @@ export class Configuration {
 
     let currentValue = this.properties;
 
-    for (let i = 0; i < parts.length - 1 && currentValue instanceof Object; i++) {
+    for (
+      let i = 0;
+      i < parts.length - 1 && currentValue instanceof Object;
+      i++
+    ) {
       const part = parts[i];
       if (!(part in currentValue)) {
         currentValue[part] = {};

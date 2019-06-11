@@ -6,7 +6,7 @@ describe('CommandLineSource', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('Skips input if it wasn\'t a dashed parameter', async () => {
+  it("Skips input if it wasn't a dashed parameter", async () => {
     const result = new CommandLineSource(['hello-world']).load();
     expect(result).toHaveLength(0);
   });

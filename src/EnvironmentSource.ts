@@ -2,8 +2,9 @@ import { Source } from './Source';
 import { Property } from './Property';
 
 export class EnvironmentSource implements Source {
-  constructor(private readonly env: { [key: string]: string | undefined } = process.env) {
-  }
+  constructor(
+    private readonly env: { [key: string]: string | undefined } = process.env,
+  ) {}
 
   load(): Property[] {
     const result: Property[] = [];
@@ -14,5 +15,4 @@ export class EnvironmentSource implements Source {
 
     return result;
   }
-
 }

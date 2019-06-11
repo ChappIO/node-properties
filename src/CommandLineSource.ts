@@ -2,8 +2,7 @@ import { Source } from './Source';
 import { Property } from './Property';
 
 export class CommandLineSource implements Source {
-  constructor(private readonly args: string[] = process.argv) {
-  }
+  constructor(private readonly args: string[] = process.argv) {}
 
   load(): Property[] {
     const result: Property[] = [];
@@ -31,5 +30,4 @@ export class CommandLineSource implements Source {
 
     return result;
   }
-
 }

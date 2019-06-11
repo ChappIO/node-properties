@@ -6,9 +6,7 @@ import { safeLoad } from 'js-yaml';
 import { Logger } from './Logger';
 
 export class YamlSource implements Source {
-  constructor(private readonly path: string,
-              private readonly logger: Logger) {
-  }
+  constructor(private readonly path: string, private readonly logger: Logger) {}
 
   load(): Property[] {
     try {
